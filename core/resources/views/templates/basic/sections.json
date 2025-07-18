@@ -1,0 +1,327 @@
+{
+    "banner": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Banner Section",
+        "content": {
+            "images": {
+                "thumbnail_image": {
+                    "size": "1270x1340"
+                }
+            },
+            "title": "text",
+            "heading": "text",
+            "subheading": "text",
+            "left_button_text": "text",
+            "left_button_link": "text",
+            "right_button_text": "text",
+            "right_button_link": "text"
+        }
+    },
+    "about": {
+        "builder": true,
+        "name": "About Us",
+        "content": {
+            "images": {
+                "about_image": {
+                    "size": "1130x1000"
+                }
+            },
+            "title": "text",
+            "heading": "text",
+            "subheading": "text",
+            "description": "textarea",
+            "button_text": "text",
+            "button_url": "text"
+        }
+    },
+    "feature": {
+        "builder": true,
+        "name": "Feature Section",
+        "content": {
+            "title": "text",
+            "heading": "text",
+            "subheading": "text"
+        },
+        "element": {
+            "images": {
+                "icon_image": {
+                    "size": "75x75"
+                }
+            },
+            "title": "text",
+            "description": "textarea",
+            "modal": true
+        }
+    },
+    "service": {
+        "builder": true,
+        "name": "Service Section",
+        "content": {
+            "title": "text",
+            "heading": "text",
+            "subheading": "text"
+        },
+        "element": {
+            "images": {
+                "icon_image": {
+                    "size": "100x100"
+                }
+            },
+            "title": "text",
+            "description": "textarea",
+            "modal": false
+        }
+    },
+    "plan": {
+        "builder": true,
+        "name": "Plan Section",
+        "content": {
+            "images": {
+                "background_image_left": {
+                    "size": "875x975"
+                },
+                "background_image_right": {
+                    "size": "740x975"
+                }
+            },
+            "title": "text",
+            "heading": "text",
+            "subheading": "text"
+        }
+    },
+    "faq": {
+        "builder": true,
+        "name": "FAQ Section",
+        "content": {
+            "images": {
+                "faq_image": {
+                    "size": "1050x1060"
+                }
+            },
+            "title": "text",
+            "heading": "text",
+            "subheading": "text"
+        },
+        "element": {
+            "question": "text",
+            "answer": "textarea",
+            "modal": true
+        }
+    },
+    "cta": {
+        "builder": true,
+        "name": "CTA Section",
+        "content": {
+            "images": {
+                "cta_image": {
+                    "size": "800x800"
+                }
+            },
+            "title": "text",
+            "heading": "text",
+            "subheading": "text",
+            "playstore_url": "text"
+        }
+    },
+    "subscribe": {
+        "builder": true,
+        "name": "Subscribe Section",
+        "content": {
+            "heading": "text",
+            "subheading": "text",
+            "button_text": "text"
+        }
+    },
+    "policy_pages": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Policy Pages",
+        "hide_builder": true,
+        "element": {
+            "title": "text",
+            "slug": "title",
+            "details": "textarea-nic",
+            "modal": false,
+            "seo": true
+        }
+    },
+    "register_disable": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Registration Disable",
+        "content": {
+            "images": {
+                "image": {
+                    "size": "280x280"
+                }
+            },
+            "heading": "text",
+            "subheading": "text",
+            "button_name": "text",
+            "button_url": "text"
+        }
+    },
+    "blog": {
+        "builder": true,
+        "name": "Blog Section",
+        "content": {
+            "title": "text",
+            "heading": "text",
+            "subheading": "text"
+        },
+        "element": {
+            "images": {
+                "image": {
+                    "size": "966x450",
+                    "thumb": "420x195"
+                }
+            },
+            "title": "text",
+            "slug": "title",
+            "description": "textarea-nic",
+            "modal": false,
+            "seo": true
+        }
+    },
+    "footer": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Footer Section",
+        "content": {
+            "short_description": "text"
+        }
+    },
+    "social_icon": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Social Icons",
+        "element": {
+            "social_icon": "icon",
+            "url": "text",
+            "modal": true
+        }
+    },
+    "contact": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Contact Section",
+        "content": {
+            "images": {
+                "image": {
+                    "size": "1110x1170"
+                }
+            },
+            "address": "text",
+            "primary_email_address": "text",
+            "secondary_email_address": "text",
+            "primary_phone_number": "text",
+            "secondary_phone_number": "text",
+            "location_map_url": "text",
+            "form_title": "text",
+            "form_button_text": "text"
+        }
+    },
+    "auth": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Auth Section",
+        "content": {
+            "images": {
+                "auth_image": {
+                    "size": "1060x1080"
+                }
+            }
+        }
+    },
+    "login": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Login Page",
+        "content": {
+            "title": "text",
+            "heading": "text"
+        }
+    },
+    "register": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Regiser Page",
+        "content": {
+            "title": "text",
+            "heading": "text"
+        }
+    },
+    "how_it_works": {
+        "builder": true,
+        "name": "How It Works",
+        "content": {
+            "title": "text",
+            "heading": "text",
+            "subheading": "textarea"
+        },
+        "element": {
+            "title": "text",
+            "description": "textarea",
+            "modal": true
+        }
+    },
+    "testimonial": {
+        "builder": true,
+        "name": "Testimonial Section",
+        "content": {
+            "title": "text",
+            "heading": "text",
+            "subheading": "textarea"
+        },
+        "element": {
+            "images": {
+                "image": {
+                    "size": "100x100"
+                }
+            },
+            "quote": "textarea",
+            "name": "text",
+            "designation": "text",
+            "modal": true
+        }
+    },
+    "api_integration": {
+        "builder": true,
+        "name": "API Integration Section",
+        "content": {
+            "images": {
+                "image": {
+                    "size": "1200x1200"
+                }
+            },
+            "title": "text",
+            "heading": "text",
+            "subheading": "textarea",
+            "button_text": "text",
+            "button_url": "text"
+        },
+        "element": {
+            "title": "text",
+            "description": "textarea",
+            "images": {
+                "icon_image": {
+                    "size": "100x100"
+                }
+            },
+            "modal": true
+        }
+    },
+    "brands": {
+        "builder": true,
+        "name": "Brand Section",
+        "element": {
+            "images": {
+                "image": {
+                    "size": "140x35"
+                }
+            },
+            "modal": true
+        }
+    }
+}
