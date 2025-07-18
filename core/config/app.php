@@ -70,7 +70,7 @@ return [
     |
     */
 
-    'timezone' => $timezone,
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
 
     /*
     |--------------------------------------------------------------------------
@@ -128,15 +128,6 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-
-    /**
-     * Pushser Configuration
-     *
-     */
-    'PUSHER_APP_ID'      => $pusherAppId,
-    'PUSHER_APP_KEY'     => $pusherAppKey,
-    'PUSHER_APP_SECRET'  => $pusherAppSecret,
-    'PUSHER_APP_CLUSTER' => $pusherAppCluster,
     /*
     |--------------------------------------------------------------------------
     | Class Aliases

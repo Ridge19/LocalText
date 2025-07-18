@@ -77,9 +77,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // ──────── Force HTTPS ────────
-        if ( gs('force_ssl') ) {
-            URL::forceScheme('https');
-        }
+        // Temporarily disabled for local development
+        // if ( gs('force_ssl') && app()->environment('production') ) {
+        //     URL::forceScheme('https');
+        // }
 
         // ──────── Pagination Styling ────────
         Paginator::useBootstrapFive();
