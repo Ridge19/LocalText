@@ -28,19 +28,19 @@ while (true) {
             
             foreach ($pendingSms as $sms) {
                 if ($sms->device && $sms->device->status == 1) {
-                    $sms->status = 1; // processing
+                    $sms->status = 4; // SMS_PROCESSING
                     $sms->save();
                     
                     // Simulate processing time (0.5-2 seconds)
                     usleep(rand(500000, 2000000));
                     
-                    $sms->status = 2; // delivered
+                    $sms->status = 1; // SMS_DELIVERED
                     $sms->save();
                     
                     echo "  ✅ SMS {$sms->id} to {$sms->mobile_number} delivered\n";
                     $processedCount++;
                 } else {
-                    $sms->status = 3; // failed - device not connected
+                    $sms->status = 9; // SMS_FAILED - device not connected
                     $sms->save();
                     echo "  ❌ SMS {$sms->id} failed - device not connected\n";
                 }

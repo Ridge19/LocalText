@@ -59,7 +59,7 @@ try {
             'message' => [[
                 'id' => 888888,
                 'mobile_number' => '61480597773',
-                'message' => '🚨 URGENT: Device connection test. If you receive this SMS, reply "WORKING" to confirm the system is operational.',
+                'message' => '🚨 URGENT: Device connection test. If you receive this SMS, reply "WORKING" to confirm the system is operational. Reply STOP to opt out.',
                 'device_slot_number' => 0,
                 'device_slot_name' => 'SIM 1'
             ]]

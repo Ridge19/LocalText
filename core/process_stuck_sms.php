@@ -36,13 +36,13 @@ if ($stuckSms->count() > 0) {
             sleep(1);
             
             // Mark as delivered (in real app, device would respond)
-            $sms->status = 2;
+            $sms->status = 1; // SMS_DELIVERED
             $sms->save();
             
             echo "✅ SMS processed successfully!\n";
         } else {
             echo "❌ Device not connected. Marking as failed.\n";
-            $sms->status = 3; // failed
+            $sms->status = 9; // SMS_FAILED
             $sms->save();
         }
         
