@@ -1,0 +1,105 @@
+.custom-select-area p {
+    margin-bottom: 0;
+}
+
+.custom-select-area {
+    position: relative;
+}
+
+.selected-option {
+    padding: 15px 16px;
+    border: 1px solid hsl(var(--base-two) / .15);
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: hsl(var(--white));
+}
+
+.custom-select-list {
+    border-radius: 5px;
+    position: absolute;
+    width: 100%;
+    top: 50px;
+    height: auto;
+    z-index: 9;
+    background: #fff;
+    max-height: 300px;
+    overflow: auto;
+    box-shadow: 0 5px 30px hsl(var(--base-two) / .12);
+}
+
+.custom-select-list::-webkit-scrollbar {
+    background-color: #ced4da;
+    width: 5px;
+}
+
+.custom-select-list::-webkit-scrollbar-thumb {
+    background: #706f6f73;
+    border-radius: 15px;
+}
+
+.single-select-option {
+    padding: 0.625rem 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.selected-option .option-thumb,
+.single-select-option .option-thumb {
+    width: 28px;
+    height: 28px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 50px;
+    margin-right: 7px;
+}
+
+.single-select-option:hover {
+    background: hsl(var(--base));
+}
+
+.single-select-option:hover .custom-select-title {
+    color: hsl(var(--white));
+}
+
+.single-select-option:last-child {
+    margin-bottom: 0;
+    border-bottom: 0;
+}
+
+.custom-select-title {
+    font-size: 14px;
+    line-height: 1;
+    color: hsl(var(--body-color));
+    font-weight: 600;
+}
+
+.single-select-option .custom-select-sub-title {
+    font-size: 12px;
+}
+
+.custom-select {
+    height: 0;
+    width: 0;
+    visibility: hidden;
+    display: none;
+}
+
+.search-enabled {
+    padding: 0;
+    border-color: #65646473
+}
+
+.search-enabled .custom-select-filter {
+    padding: 0.625rem 1.25rem;
+    border: 0;
+    border-radius: 5px;
+}
+
+.search-enabled .custom-select-filter:focus,
+.search-enabled .custom-select-filter:active {
+    border: 0;
+    box-shadow: 0;
+    outline: 0;
+}

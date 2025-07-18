@@ -33,12 +33,15 @@ return [
 
         'pusher' => [
             'driver' => 'pusher',
-            'key' =>  config('app.PUSHER_APP_KEY'),
-            'secret' => config('app.PUSHER_APP_SECRET'),
-            'app_id' => config('app.PUSHER_APP_ID'),
+            'key' =>  env('PUSHER_APP_KEY'),
+            'secret' => env('PUSHER_APP_SECRET'),
+            'app_id' => env('PUSHER_APP_ID'),
             'options' => [
-                'cluster' => config('app.PUSHER_APP_CLUSTER'),
-                'useTLS' => true,
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'useTLS' => false, // Disable SSL for development
+                'host' => 'api-' . env('PUSHER_APP_CLUSTER') . '.pusher.com',
+                'port' => 80,
+                'scheme' => 'http'
             ],
             'client_options' => [
                 // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html

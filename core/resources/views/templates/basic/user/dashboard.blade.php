@@ -262,9 +262,249 @@
 
 @push('style')
     <style>
+        /* Modern Template Dashboard Styling */
+        body {
+            background: #f8f9fc !important;
+        }
+
+        /* Dashboard Widget Cards */
+        .dashboard-widget-main {
+            background: #fff;
+            border: 1px solid #e3e6f0;
+            border-radius: 0.35rem;
+            padding: 1.5rem;
+            display: block;
+            text-decoration: none;
+            transition: all 0.15s ease-in-out;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-widget-main:hover {
+            transform: translateY(-0.125rem);
+            box-shadow: 0 0.25rem 2rem 0 rgba(58, 59, 69, 0.25);
+            text-decoration: none;
+            border-color: #5a5c69;
+        }
+
+        .dashboard-widget-main h6 {
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-bottom: 0;
+            color: #5a5c69 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
+
+        .dashboard-widget-main .widget-amount {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-top: 0.5rem !important;
+            line-height: 1.2;
+            color: #5a5c69;
+        }
+
+        .dashboard-widget-main .widget-amount span {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: #858796 !important;
+        }
+
+        .dashboard-widget-main i {
+            font-size: 2rem !important;
+            opacity: 0.3;
+        }
+
+        /* Color scheme */
+        .text--info, .dashboard-widget-main .text--info {
+            color: #36b9cc !important;
+        }
+
+        .text--success, .dashboard-widget-main .text--success {
+            color: #1cc88a !important;
+        }
+
+        .text--danger, .dashboard-widget-main .text--danger {
+            color: #e74a3b !important;
+        }
+
+        .text--primary, .dashboard-widget-main .text--primary {
+            color: #4e73df !important;
+        }
+
+        .text--dark, .dashboard-widget-main .text--dark {
+            color: #5a5c69 !important;
+        }
+
+        /* Card Enhancements */
+        .custom--card {
+            border: 1px solid #e3e6f0;
+            border-radius: 0.35rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            transition: all 0.15s ease-in-out;
+            background: #fff;
+        }
+
+        .custom--card:hover {
+            transform: translateY(-0.0625rem);
+            box-shadow: 0 0.25rem 2rem 0 rgba(58, 59, 69, 0.25);
+        }
+
+        .custom--card .card-header {
+            background: #f8f9fc;
+            color: #5a5c69;
+            border-bottom: 1px solid #e3e6f0;
+            border-radius: 0.35rem 0.35rem 0 0;
+            padding: 0.75rem 1.25rem;
+            font-weight: 700;
+        }
+
+        .custom--card .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin: 0;
+            color: #5a5c69;
+        }
+
+        .custom--card .card-body {
+            padding: 1.25rem;
+        }
+
+        /* Plan Details List */
+        .list.list-style-three {
+            margin: 0;
+            padding: 0;
+        }
+
+        .list.list-style-three li {
+            position: relative;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e3e6f0;
+            transition: background 0.15s ease-in-out;
+        }
+
+        .list.list-style-three li:hover {
+            background: #f8f9fc;
+            border-radius: 0.25rem;
+            margin: 0 -0.5rem;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .list.list-style-three li:last-child {
+            border-bottom: none;
+        }
+
+        .list.list-style-three li .label,
+        .list.list-style-three li .value {
+            width: calc(50% - 20px);
+            font-size: 0.8rem;
+            font-family: inherit;
+        }
+
+        .list.list-style-three li .label {
+            color: #858796;
+            font-weight: 400;
+        }
+
+        .list.list-style-three li .value {
+            color: #5a5c69;
+            font-weight: 600;
+        }
+
+        /* Button Enhancements */
+        .btn--base {
+            background: #4e73df;
+            border: 1px solid #4e73df;
+            border-radius: 0.35rem;
+            font-weight: 400;
+            transition: all 0.15s ease-in-out;
+            text-transform: none;
+            letter-spacing: 0;
+            font-size: 0.8rem;
+            color: #fff;
+            padding: 0.375rem 0.75rem;
+        }
+
+        .btn--base:hover {
+            background: #2e59d9;
+            border-color: #2653d4;
+            transform: translateY(-0.0625rem);
+            box-shadow: 0 0.125rem 0.5rem 0 rgba(78, 115, 223, 0.5);
+            color: #fff;
+        }
+
+        /* Recent SMS Table */
+        .message-table {
+            margin: 0;
+            background: #fff;
+            color: #858796;
+        }
+
+        .message-table thead th {
+            background: #f8f9fc;
+            border: none;
+            color: #5a5c69;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.05rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        .message-table tbody tr {
+            transition: all 0.15s ease-in-out;
+            border: none;
+        }
+
+        .message-table tbody tr:hover {
+            background: #f8f9fc;
+        }
+
+        .message-table tbody td {
+            padding: 0.75rem;
+            border: none;
+            border-bottom: 1px solid #e3e6f0;
+            vertical-align: middle;
+            color: #858796;
+            font-size: 0.8rem;
+        }
+
+        /* Badge Improvements */
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.35rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
+
+        .badge--success {
+            background: #1cc88a;
+            color: #fff;
+        }
+
+        .badge--primary {
+            background: #4e73df;
+            color: #fff;
+        }
+
+        /* Message Modal */
         .message {
             cursor: pointer;
-            font-size: 12px !important;
+            font-size: 0.65rem !important;
+            color: #4e73df;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
+
+        .message:hover {
+            text-decoration: underline;
+            color: #2e59d9;
         }
 
         .card-header-dropdown {
@@ -272,21 +512,131 @@
             border-bottom: unset;
         }
 
-        .list.list-style-three li .label,
-        .list.list-style-three li .value {
-            width: calc(50% - 20px);
-            font-size: 15px;
-            font-family: var(--heading-font);
+        /* Container and spacing adjustments */
+        .row.g-3 {
+            margin-bottom: 1.5rem;
         }
 
-        .list.list-style-three li {
-            position: relative;
-            padding: 12px 0;
-            border-bottom: 1px solid #ebebeb;
+        .row.gy-4 {
+            margin-top: 1.5rem;
         }
 
-        .list.list-style-three li:last-child {
-            border-bottom: none;
+        /* Alert Box Enhancement */
+        .alert {
+            border-radius: 0.35rem;
+            border: 1px solid;
+            font-weight: 400;
+            font-size: 0.8rem;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+
+        /* Notice Enhancement */
+        .notice {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Modal Styling */
+        .modal-content {
+            border: 1px solid #e3e6f0;
+            border-radius: 0.35rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #e3e6f0;
+            padding: 1rem 1.25rem;
+            background: #f8f9fc;
+        }
+
+        .modal-title {
+            color: #5a5c69;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .modal-body {
+            padding: 1.25rem;
+            color: #858796;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .dashboard-widget-main {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .dashboard-widget-main .widget-amount {
+                font-size: 1.125rem;
+            }
+
+            .custom--card .card-header {
+                padding: 0.75rem 1rem;
+            }
+
+            .custom--card .card-body {
+                padding: 1rem;
+            }
+
+            .list.list-style-three li {
+                padding: 0.5rem 0;
+            }
+
+            .list.list-style-three li .label,
+            .list.list-style-three li .value {
+                font-size: 0.75rem;
+            }
+
+            .message-table thead th,
+            .message-table tbody td {
+                padding: 0.5rem 0.25rem;
+            }
+        }
+
+        /* Text muted override */
+        .text-muted {
+            color: #858796 !important;
+        }
+
+        .text-secondary {
+            color: #858796 !important;
+        }
+
+        /* Table responsive wrapper */
+        .table-responsive {
+            border-radius: 0.35rem;
+            border: 1px solid #e3e6f0;
+        }
+
+        /* Bootstrap spacing overrides */
+        .mb-0 {
+            margin-bottom: 0 !important;
+        }
+
+        .mt-2 {
+            margin-top: 0.5rem !important;
+        }
+
+        .mb-3 {
+            margin-bottom: 1rem !important;
+        }
+
+        .mb-4 {
+            margin-bottom: 1.5rem !important;
+        }
+
+        /* Widget hover effects */
+        .dashboard-widget-main:hover .widget-amount {
+            color: #2e59d9;
+        }
+
+        .dashboard-widget-main:hover h6 {
+            color: #2e59d9 !important;
         }
     </style>
 @endpush
