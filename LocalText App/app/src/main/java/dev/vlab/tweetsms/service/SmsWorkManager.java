@@ -199,6 +199,28 @@ public class SmsWorkManager extends Worker {
                         }
                     }, "message-send");
                 }
+
+                // Subscribe to device logout channel
+                String logoutChannelName = "private-device-logout";
+                if (pusherOdk.getPusherApp().getPrivateChannel(logoutChannelName) == null) {
+                    pusherOdk.getPusherApp().subscribePrivate(logoutChannelName, new PrivateChannelEventListener() {
+                        @Override
+                        public void onAuthenticationFailure(String message, Exception e) {
+                            Log.e(TAG, "Device Logout Channel Authentication Failure: " + e.toString());
+                        }
+
+                        @Override
+                        public void onSubscriptionSucceeded(String channelName) {
+                            Log.i(TAG, "Device Logout Subscription Succeeded for channel: " + channelName);
+                        }
+
+                        @Override
+                        public void onEvent(PusherEvent event) {
+                            Log.d(TAG, "Device Logout Event received: " + event.toString());
+                            processDeviceLogoutEvent(event.toString());
+                        }
+                    }, "device-logout");
+                }
             }
         } catch (Exception e) {
             Log.e(TAG, "Pusher initialization exception: " + e);
@@ -234,6 +256,42 @@ public class SmsWorkManager extends Worker {
 
         } catch (Exception e) {
             Log.e("processEvent", "exception in on event method : " + e);
+        }
+    }
+
+    void processDeviceLogoutEvent(String event) {
+        try {
+            JSONObject object = new JSONObject(event);
+            Log.i("DEVICE-LOGOUT-EVENT", object.toString());
+            
+            // Extract deviceId from the logout event
+            JSONObject data = new JSONObject(object.getString("data"));
+            String disconnectedDeviceId = data.getString("deviceId");
+            String currentDeviceId = SharedPrefManager.getInstance(context).getDeviceId();
+            
+            Log.i(TAG, "Logout event for device: " + disconnectedDeviceId + ", current device: " + currentDeviceId);
+            
+            // Check if this logout event is for the current device
+            if (disconnectedDeviceId.equals(currentDeviceId)) {
+                Log.i(TAG, "Device logout event matches current device - forcing disconnect");
+                
+                // Clear the device session
+                SharedPrefManager manager = SharedPrefManager.getInstance(context);
+                manager.setStatus("false");
+                
+                // Force disconnect Pusher
+                PusherOdk.forceDisconnect();
+                
+                // Send broadcast to MainActivity to update UI
+                Intent intent = new Intent("dev.vlab.tweetsms.DEVICE_FORCE_DISCONNECT");
+                intent.putExtra("deviceId", disconnectedDeviceId);
+                context.sendBroadcast(intent);
+                
+                Log.i(TAG, "Device disconnected due to remote logout request");
+            }
+            
+        } catch (Exception e) {
+            Log.e("processDeviceLogoutEvent", "exception in device logout event method: " + e);
         }
     }
 

@@ -60,6 +60,14 @@ public class PusherOdk {
         }
     }
 
+    public static void forceDisconnect() {
+        if (instance != null) {
+            instance.disconnect();
+            instance = null;
+            isConnected = false;
+        }
+    }
+
     public Pusher getPusherApp() {
         return pusherApp;
     }

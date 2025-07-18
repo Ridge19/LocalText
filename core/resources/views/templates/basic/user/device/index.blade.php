@@ -44,6 +44,7 @@
                                     <th>@lang('Android Version')</th>
                                     <th>@lang('App Version')</th>
                                     <th>@lang('Status')</th>
+                                    <th>@lang('Action')</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -61,6 +62,18 @@
                                                 <span class="badge badge--success">@lang('Connected')</span>
                                             @else
                                                 <span class="badge badge--danger">@lang('Disconnected')</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($device->status)
+                                                <button type="button" class="btn btn--danger btn--sm disconnect-btn" 
+                                                        data-device-id="{{ $device->id }}" 
+                                                        data-device-name="{{ $device->device_name }}"
+                                                        title="@lang('Disconnect Device')">
+                                                    <i class="las la-unlink"></i> @lang('Disconnect')
+                                                </button>
+                                            @else
+                                                <span class="text-muted">@lang('Already Disconnected')</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -81,6 +94,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Connect Device Modal -->
     <div class="modal custom--modal fade modal-lg" id="modal">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -107,6 +122,37 @@
                     <div class="text-center pb-3">
                         <img src="{{ $qrCodeImgSrc }}" class="b--5 p-3 border--base rounded" alt="">
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disconnect Device Modal -->
+    <div class="modal custom--modal fade" id="disconnectModal">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header modal--header">
+                    <h4 class="modal-title">@lang('Disconnect Device')</h4>
+                    <button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="las la-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-center">
+                        @lang('Are you sure you want to disconnect') <strong id="deviceNameToDisconnect"></strong>?
+                    </p>
+                    <p class="text-muted text-center">
+                        @lang('This will stop the device from processing SMS messages until it connects again.')
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn--dark" data-bs-dismiss="modal">@lang('Cancel')</button>
+                    <form id="disconnectForm" method="POST" style="display: inline;">
+                        @csrf
+                        <button type="submit" class="btn btn--danger">
+                            <i class="las la-unlink"></i> @lang('Disconnect Device')
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -141,6 +187,45 @@
             $('.addBtn').on('click', function(e) {
                 $("#modal").modal('show');
             });
+
+            // Disconnect device functionality
+            $('.disconnect-btn').on('click', function(e) {
+                e.preventDefault();
+                const deviceId = $(this).data('device-id');
+                const deviceName = $(this).data('device-name');
+                
+                $('#deviceNameToDisconnect').text(deviceName);
+                $('#disconnectForm').attr('action', `{{ route('user.device.disconnect', '') }}/${deviceId}`);
+                $('#disconnectModal').modal('show');
+            });
+
+            // Handle disconnect form submission
+            $('#disconnectForm').on('submit', function(e) {
+                e.preventDefault();
+                const form = $(this);
+                const submitBtn = form.find('button[type="submit"]');
+                
+                // Disable submit button and show loading
+                submitBtn.prop('disabled', true);
+                submitBtn.html('<i class="las la-spinner la-spin"></i> @lang("Disconnecting...")');
+                
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'POST',
+                    data: form.serialize(),
+                    success: function(response) {
+                        $('#disconnectModal').modal('hide');
+                        location.reload(); // Reload to show updated status
+                    },
+                    error: function(xhr) {
+                        console.error('Disconnect failed:', xhr);
+                        // Re-enable button
+                        submitBtn.prop('disabled', false);
+                        submitBtn.html('<i class="las la-unlink"></i> @lang("Disconnect Device")');
+                    }
+                });
+            });
+
             const pusherConnection = (eventName) => {
                 pusher.connection.bind('connected', () => {
                     const SOCKET_ID = pusher.connection.socket_id;
@@ -183,6 +268,14 @@
                     if (exitsDevice.length > 0) {
                         $("#device-table").find(`tbody .device-${device.device_id} .device-status`)
                             .html(`<span class="badge badge--success">@lang('Connected')</span>`);
+                        // Update action column for reconnected device
+                        $("#device-table").find(`tbody .device-${device.device_id} td:last-child`)
+                            .html(`<button type="button" class="btn btn--danger btn--sm disconnect-btn" 
+                                           data-device-id="${device.id}" 
+                                           data-device-name="${device.device_name}"
+                                           title="@lang('Disconnect Device')">
+                                       <i class="las la-unlink"></i> @lang('Disconnect')
+                                   </button>`);
                     } else {
                         let html = `
                         <tr class="device-${device.device_id}">
@@ -196,10 +289,21 @@
                             <td  class="device-status">
                                 <span class="badge badge--success">@lang('Connected')</span>
                             </td>
+                            <td>
+                                <button type="button" class="btn btn--danger btn--sm disconnect-btn" 
+                                        data-device-id="${device.id}" 
+                                        data-device-name="${device.device_name}"
+                                        title="@lang('Disconnect Device')">
+                                    <i class="las la-unlink"></i> @lang('Disconnect')
+                                </button>
+                            </td>
                         </tr>`;
                         $("#device-table").find("tbody").prepend(html);
                         $("#device-table").find(".empty-message-row").remove();
                     }
+                    
+                    // Re-bind click events for new disconnect buttons
+                    bindDisconnectEvents();
                 }, 3000);
             }
 
@@ -211,8 +315,27 @@
                     $(".modal").find(".modal-header button").click();
                     $("#device-table").find(`tbody .device-${deviceId} .device-status`)
                         .html(`<span class="badge badge--danger">@lang('Disconnected')</span>`);
+                    // Update action column for disconnected device
+                    $("#device-table").find(`tbody .device-${deviceId} td:last-child`)
+                        .html(`<span class="text-muted">@lang('Already Disconnected')</span>`);
                 }, 3000);
             }
+
+            // Function to bind disconnect events (for dynamically added buttons)
+            const bindDisconnectEvents = () => {
+                $('.disconnect-btn').off('click').on('click', function(e) {
+                    e.preventDefault();
+                    const deviceId = $(this).data('device-id');
+                    const deviceName = $(this).data('device-name');
+                    
+                    $('#deviceNameToDisconnect').text(deviceName);
+                    $('#disconnectForm').attr('action', `{{ route('user.device.disconnect', '') }}/${deviceId}`);
+                    $('#disconnectModal').modal('show');
+                });
+            };
+
+            // Initial binding
+            bindDisconnectEvents();
         })(jQuery);
     </script>
 @endpush

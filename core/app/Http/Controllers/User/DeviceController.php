@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Device;
+use App\Events\DeviceLogOut;
 
 class DeviceController extends Controller
 {
@@ -22,5 +23,20 @@ class DeviceController extends Controller
         $qrCodeImgSrc = cryptoQR($userId . "HOST" . $rootUrl);
 
         return view('Template::user.device.index', compact('pageTitle', 'allDevice', 'qrCodeImgSrc'));
+    }
+
+    public function disconnect($id)
+    {
+        $device = Device::belongsToUser()->where('id', $id)->firstOrFail();
+        
+        // Update device status to disconnected
+        $device->status = 0;
+        $device->save();
+        
+        // Broadcast device logout event
+        broadcast(new DeviceLogOut($device->device_id));
+        
+        $notify[] = ['success', 'Device disconnected successfully'];
+        return back()->withNotify($notify);
     }
 }

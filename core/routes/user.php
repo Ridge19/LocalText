@@ -113,6 +113,7 @@ Route::middleware('auth')->name('user.')->group(function () {
             // Manage Device
             Route::prefix('device')->controller("DeviceController")->name('device.')->group(function () {
                 Route::get('/', 'index')->name('index');
+                Route::post('/disconnect/{id}', 'disconnect')->name('disconnect');
             });
 
             // SMS Manager

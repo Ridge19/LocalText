@@ -2,8 +2,10 @@ package dev.vlab.tweetsms.presentation.main;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
@@ -66,78 +68,189 @@ public class MainActivity extends AppCompatActivity {
     Button logoutButton;
     LinearLayout connectedLL;
 
+    // Broadcast receiver for force disconnect
+    private BroadcastReceiver forceDisconnectReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if ("dev.vlab.tweetsms.DEVICE_FORCE_DISCONNECT".equals(intent.getAction())) {
+                String deviceId = intent.getStringExtra("deviceId");
+                Log.i(TAG, "Received force disconnect broadcast for device: " + deviceId);
+                
+                runOnUiThread(() -> {
+                    // Update UI to show disconnected state
+                    connectedLL.setBackground(ContextCompat.getDrawable(MainActivity.this, R.drawable.bg_disconnect));
+                    statusText.setText("Disconnected by Admin");
+                    
+                    // Show message to user
+                    Toasty.warning(MainActivity.this, "Your device has been disconnected remotely. Please scan QR code to reconnect.", Toast.LENGTH_LONG).show();
+                    
+                    // Redirect to login activity after a short delay
+                    statusText.postDelayed(() -> {
+                        Intent loginIntent = new Intent(MainActivity.this, LoginActivity.class);
+                        loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(loginIntent);
+                        finish();
+                    }, 3000); // 3 second delay to show the message
+                });
+            }
+        }
+    };
+
     @SuppressLint({"QueryPermissionsNeeded", "SetTextI18n", "SourceLockedOrientationActivity"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ctx = getApplicationContext();
-        setContentView(R.layout.activity_main);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        Window window = this.getWindow();
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        
+        try {
+            Log.d(TAG, "MainActivity onCreate started");
+            
+            ctx = getApplicationContext();
+            setContentView(R.layout.activity_main);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            
+            // Window setup with error handling
+            try {
+                Window window = this.getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
 
-        //      window.setNavigationBarColor(getResources().getColor(R.color.splash_screen_bg));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.setStatusBarColor(ContextCompat.getColor(this, R.color.splash_screen_bg));
-            getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.splash_screen_bg));
-        }
-
-        statusText = findViewById(R.id.status_text_id);
-        connectedLL = findViewById(R.id.connected_ll);
-        logoutButton = findViewById(R.id.logout);
-        @SuppressLint("UseCompatLoadingForDrawables") Drawable drawable = getResources().getDrawable(R.drawable.logout);
-        drawable.setBounds(0, 0, 30, 30); // Set the size here
-        logoutButton.setCompoundDrawables(drawable, null, null, null);
-
-        setInitialColor();
-
-        connectedLL.setOnClickListener(view -> {
-
-            if (statusText.getText().toString().equalsIgnoreCase(connecting) || statusText.getText().toString().equalsIgnoreCase(disconnecting)) {
-
-            } else {
-                changeOnOffStatus();
-
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    window.setStatusBarColor(ContextCompat.getColor(this, R.color.splash_screen_bg));
+                    getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.splash_screen_bg));
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error setting up window", e);
+                // Continue without window customization if it fails
             }
 
-        });
+            // UI initialization with error handling
+            try {
+                statusText = findViewById(R.id.status_text_id);
+                connectedLL = findViewById(R.id.connected_ll);
+                logoutButton = findViewById(R.id.logout);
+                
+                if (statusText == null || connectedLL == null || logoutButton == null) {
+                    throw new RuntimeException("Failed to find required UI elements");
+                }
+                
+                @SuppressLint("UseCompatLoadingForDrawables") Drawable drawable = getResources().getDrawable(R.drawable.logout);
+                if (drawable != null) {
+                    drawable.setBounds(0, 0, 30, 30);
+                    logoutButton.setCompoundDrawables(drawable, null, null, null);
+                }
 
-        logoutButton.setOnClickListener(v -> {
-            // Create a confirmation dialog
-            new AlertDialog.Builder(MainActivity.this)
-                    .setTitle("Confirm Logout")
-                    .setMessage("Are you sure you want to logout?")
-                    .setPositiveButton("Yes", (dialog, which) -> {
-                        // Perform logout actions
-                        SharedPrefManager manager = SharedPrefManager.getInstance(MainActivity.this);
-                        manager.setStatus("false");
-                        logoutButton.setText("Logout....");
-                        logout();
-                        // Don't set text back to "Logout" here, as the activity will finish or change
-                        // Optionally, you can disable the button to prevent double clicks
-                        logoutButton.setEnabled(false);
-                    })
-                    .setNegativeButton("No", (dialog, which) -> {
-                        // Dismiss the dialog
-                        dialog.dismiss();
-                    })
-                    .show();
-        });
+                setInitialColor();
+                Log.d(TAG, "UI elements initialized successfully");
+            } catch (Exception e) {
+                Log.e(TAG, "Error initializing UI elements", e);
+                // Show error message and return to login
+                showErrorAndReturnToLogin("Failed to initialize app interface");
+                return;
+            }
 
+            // Click listeners setup
+            try {
+                connectedLL.setOnClickListener(view -> {
+                    if (statusText.getText().toString().equalsIgnoreCase(connecting) || 
+                        statusText.getText().toString().equalsIgnoreCase(disconnecting)) {
+                        // Do nothing during connecting/disconnecting
+                    } else {
+                        changeOnOffStatus();
+                    }
+                });
 
-        requestPermissions(new String[]{
-                Manifest.permission.READ_SMS,
-                Manifest.permission.SEND_SMS,
-                Manifest.permission.RECEIVE_SMS,
-                Manifest.permission.READ_PHONE_STATE,
-                Manifest.permission.CHANGE_NETWORK_STATE,
-                Manifest.permission.POST_NOTIFICATIONS,
-        }, 0);
+                logoutButton.setOnClickListener(v -> {
+                    // Create a confirmation dialog
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setTitle("Confirm Logout")
+                            .setMessage("Are you sure you want to logout?")
+                            .setPositiveButton("Yes", (dialog, which) -> {
+                                // Perform logout actions
+                                SharedPrefManager manager = SharedPrefManager.getInstance(MainActivity.this);
+                                manager.setStatus("false");
+                                logoutButton.setText("Logout....");
+                                logout();
+                                logoutButton.setEnabled(false);
+                            })
+                            .setNegativeButton("No", (dialog, which) -> {
+                                dialog.dismiss();
+                            })
+                            .show();
+                });
+                Log.d(TAG, "Click listeners set up successfully");
+            } catch (Exception e) {
+                Log.e(TAG, "Error setting up click listeners", e);
+                // Continue without click listeners if they fail
+            }
 
-        // Debug SMS capabilities
-        checkSmsCapabilities();
+            // Permission request
+            try {
+                requestPermissions(new String[]{
+                        Manifest.permission.READ_SMS,
+                        Manifest.permission.SEND_SMS,
+                        Manifest.permission.RECEIVE_SMS,
+                        Manifest.permission.READ_PHONE_STATE,
+                        Manifest.permission.CHANGE_NETWORK_STATE,
+                        Manifest.permission.POST_NOTIFICATIONS,
+                }, 0);
+                Log.d(TAG, "Permissions requested");
+            } catch (Exception e) {
+                Log.e(TAG, "Error requesting permissions", e);
+                // Continue without permission request if it fails
+            }
 
+            // Debug SMS capabilities
+            try {
+                checkSmsCapabilities();
+                Log.d(TAG, "SMS capabilities checked");
+            } catch (Exception e) {
+                Log.e(TAG, "Error checking SMS capabilities", e);
+                // Continue without SMS capability check if it fails
+            }
+            
+            Log.d(TAG, "MainActivity onCreate completed successfully");
+        } catch (Exception e) {
+            Log.e(TAG, "Critical error in MainActivity onCreate", e);
+            showErrorAndReturnToLogin("Critical error starting app: " + e.getMessage());
+        }
+    }
+    
+    private void showErrorAndReturnToLogin(String errorMessage) {
+        try {
+            Log.e(TAG, "Showing error and returning to login: " + errorMessage);
+            
+            // Try to show toast if possible
+            runOnUiThread(() -> {
+                try {
+                    Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error showing toast", e);
+                }
+            });
+            
+            // Wait a moment then return to login
+            new android.os.Handler().postDelayed(() -> {
+                try {
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
+                } catch (Exception e) {
+                    Log.e(TAG, "Error returning to login", e);
+                    // If we can't even return to login, try to restart the app
+                    try {
+                        Intent intent = new Intent(MainActivity.this, AccountLoginActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
+                    } catch (Exception e2) {
+                        Log.e(TAG, "Critical error - cannot restart app", e2);
+                    }
+                }
+            }, 3000);
+        } catch (Exception e) {
+            Log.e(TAG, "Error in showErrorAndReturnToLogin", e);
+        }
     }
 
     @Override
@@ -173,6 +286,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        // Register the force disconnect broadcast receiver
+        IntentFilter filter = new IntentFilter("dev.vlab.tweetsms.DEVICE_FORCE_DISCONNECT");
+        registerReceiver(forceDisconnectReceiver, filter);
+        Log.d(TAG, "Force disconnect receiver registered");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Unregister the broadcast receiver
+        try {
+            unregisterReceiver(forceDisconnectReceiver);
+            Log.d(TAG, "Force disconnect receiver unregistered");
+        } catch (IllegalArgumentException e) {
+            // Receiver was not registered
+            Log.w(TAG, "Force disconnect receiver was not registered");
+        }
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         Log.e(TAG, "onStart: ");
@@ -182,18 +317,30 @@ public class MainActivity extends AppCompatActivity {
             if (mWorkManager == null) {
                 // Initialize mWorkManager
                 mWorkManager = WorkManager.getInstance(this);
+                Log.d(TAG, "WorkManager initialized");
             }
 
             // Cancel all previous work
             mWorkManager.cancelAllWork();
+            Log.d(TAG, "Previous work cancelled");
 
             // Call Pusher with error handling
             setupBackgroundService();
+            Log.d(TAG, "Background service setup completed");
         } catch (Exception e) {
             Log.e(TAG, "onStart: error " + e.getMessage(), e);
             // Show error to user but don't crash
-            if (statusText != null) {
-                statusText.setText("Error starting services");
+            try {
+                if (statusText != null) {
+                    runOnUiThread(() -> {
+                        statusText.setText("Error starting services");
+                        Toast.makeText(MainActivity.this, 
+                            "Warning: Background services failed to start", 
+                            Toast.LENGTH_LONG).show();
+                    });
+                }
+            } catch (Exception uiError) {
+                Log.e(TAG, "Error updating UI after onStart failure", uiError);
             }
         }
     }
@@ -431,28 +578,55 @@ public class MainActivity extends AppCompatActivity {
 
     void setupBackgroundService() {
         Log.e(TAG, "setupBackgroundService: CALLED");
-        SharedPrefManager manager = SharedPrefManager.getInstance(MainActivity.this);
-        String status = manager.getStatus();
+        
+        try {
+            SharedPrefManager manager = SharedPrefManager.getInstance(MainActivity.this);
+            String status = manager.getStatus();
+            Log.d(TAG, "User status: " + status);
 
-        if (status.equalsIgnoreCase("true")) {
-            Log.d(TAG, "callPusher: Enqueuing SmsWorkManager task");
+            if (status.equalsIgnoreCase("true")) {
+                Log.d(TAG, "callPusher: Enqueuing SmsWorkManager task");
 
-            try {
-                // Create a OneTimeWorkRequest for SmsWorkManager
-                OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(SmsWorkManager.class)
-                        .build();
+                try {
+                    // Create a OneTimeWorkRequest for SmsWorkManager
+                    OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(SmsWorkManager.class)
+                            .build();
 
-                // Enqueue the work request
-                mWorkManager.enqueue(request).getResult()
-                        .addListener(() -> Log.d(TAG, "SmsWorkManager work enqueued successfully"),
-                                ContextCompat.getMainExecutor(this));
+                    // Enqueue the work request
+                    mWorkManager.enqueue(request).getResult()
+                            .addListener(() -> Log.d(TAG, "SmsWorkManager work enqueued successfully"),
+                                    ContextCompat.getMainExecutor(this));
 
-                Log.d(TAG, "callPusher: SmsWorkManager work enqueued");
+                    Log.d(TAG, "callPusher: SmsWorkManager work enqueued");
 
-            } catch (Exception e) {
-                // Handle exceptions that might occur during enqueuing
-                Log.e(TAG, "Error enqueuing SmsWorkManager task", e);
+                } catch (Exception e) {
+                    // Handle exceptions that might occur during enqueuing
+                    Log.e(TAG, "Error enqueuing SmsWorkManager task", e);
+                    // Update UI to show warning but don't crash
+                    runOnUiThread(() -> {
+                        Toast.makeText(MainActivity.this, 
+                            "Warning: Background service failed to start", 
+                            Toast.LENGTH_SHORT).show();
+                    });
+                }
+            } else {
+                Log.d(TAG, "User status is not 'true', skipping background service setup");
             }
+        } catch (Exception e) {
+            Log.e(TAG, "Critical error in setupBackgroundService", e);
+            // Update UI to show error but don't crash the app
+            runOnUiThread(() -> {
+                try {
+                    if (statusText != null) {
+                        statusText.setText("Service Error");
+                    }
+                    Toast.makeText(MainActivity.this, 
+                        "Error setting up background services", 
+                        Toast.LENGTH_LONG).show();
+                } catch (Exception uiError) {
+                    Log.e(TAG, "Error updating UI in setupBackgroundService", uiError);
+                }
+            });
         }
     }
 
